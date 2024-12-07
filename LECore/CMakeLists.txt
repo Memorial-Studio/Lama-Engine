@@ -4,6 +4,7 @@ set(ENGINE_PROJECT_NAME LamaEngineCore)
 
 set(ENGINE_PUBLIC_INCLUDES 
 	includes/LECore/Application.h
+	includes/LECore/Event.h
 	includes/LECore/Log.h
 )
 
