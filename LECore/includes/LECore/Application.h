@@ -1,7 +1,11 @@
 //
 // Created by Ganza on 05.12.2024.
 // 
+// Changed by Jack Daniels on 06.12.2024.
+// 
 #pragma once
+
+#include <memory>
 
 namespace LamaEngine
 {
@@ -19,6 +23,9 @@ namespace LamaEngine
 		virtual int start(unsigned int window_width, unsigned int window_height, const char* title);
 
 		virtual void on_update() {}
+
+	private:
+		std::unique_ptr<class Window> m_pWindow;
 
 	};
 }
