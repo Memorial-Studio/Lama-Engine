@@ -3,7 +3,7 @@
 </p>
   <p align="center">
     <img alt="Project Status: Active – The project is under active delopment!." src="https://www.repostatus.org/badges/latest/active.svg" />
-    <img alt="CodeFactor." https://www.codefactor.io/repository/github/memorial-studio/lama-engine/badge/main />
+    <img alt="CodeFactor." https://www.codefactor.io/repository/github/memorial-studio/lama-engine/badge/dev>
     <img alt="GitHub Contributors." src="https://img.shields.io/github/contributors/Memorial-Studio/Lama-Engine" />
     <img alt="Issues." src="https://img.shields.io/github/issues/Memorial-Studio/Lama-Engine?color=0088ff" />
     <img alt="Commit Activity." src="https://img.shields.io/github/commit-activity/m/Memorial-Studio/Lama-Engine/dev" />
