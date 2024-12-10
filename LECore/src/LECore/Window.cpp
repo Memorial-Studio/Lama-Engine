@@ -9,6 +9,8 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
 
 namespace LamaEngine
 {
@@ -18,6 +20,10 @@ namespace LamaEngine
         : m_data({ std::move(title), width, height })
 	{
 		int resultCode = init();
+
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGui_ImplOpenGL3_Init();
 	}
 	Window::~Window()
 	{
@@ -106,6 +112,19 @@ namespace LamaEngine
 
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
+        //size for ImGui
+        ImGuiIO& io = ImGui::GetIO();
+        io.DisplaySize.x = static_cast<float>(get_width());
+        io.DisplaySize.y = static_cast<float>(get_height());
+        //this place for drow
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::ShowDemoWindow();
+        //Drow
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 
         /* Swap front and back buffers */
         glfwSwapBuffers(m_pWindow);
