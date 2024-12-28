@@ -11,6 +11,7 @@
 #include <GLFW/glfw3.h>
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
+#include <imgui/backends/imgui_impl_glfw.h>
 
 namespace LamaEngine
 {
@@ -24,6 +25,7 @@ namespace LamaEngine
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGui_ImplOpenGL3_Init();
+        ImGui_ImplGlfw_InitForOpenGL(m_pWindow, true);
 	}
 	Window::~Window()
 	{
@@ -108,28 +110,27 @@ namespace LamaEngine
 
     void Window::on_update()
     {
-        glClearColor(0.13, 0.13, 0.13, 1);
-
-        /* Render here */
+        glClearColor(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);
         glClear(GL_COLOR_BUFFER_BIT);
-        //size for ImGui
+
         ImGuiIO& io = ImGui::GetIO();
         io.DisplaySize.x = static_cast<float>(get_width());
         io.DisplaySize.y = static_cast<float>(get_height());
-        //this place for drow
+
         ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
         ImGui::ShowDemoWindow();
-        //Drow
+
+        ImGui::Begin("Background Color Window");
+        ImGui::ColorEdit4("Background Color", m_background_color);
+        ImGui::End();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 
-        /* Swap front and back buffers */
         glfwSwapBuffers(m_pWindow);
-
-        /* Poll for and process events */
         glfwPollEvents();
     }
 }
