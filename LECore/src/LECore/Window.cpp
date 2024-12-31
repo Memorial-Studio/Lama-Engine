@@ -2,7 +2,7 @@
 // Created by Jack Daniels on 06.12.2024.
 // 
 // Changed by Jack Daniels on 07.12.2024
-//
+// Changed by Ganza on 31.12.2024
 
 #include "LECore/Window.h"
 #include "LECore/Log.h"
@@ -17,6 +17,42 @@ namespace LamaEngine
 {
     static bool s_GLFW_initialized = false;
 
+    //code shader triengle
+    GLfloat point[] = 
+    {
+     0.0f, 0.5f, 0.0f,
+     0.5f, -0.5f, 0.0f,
+     -0.5f, -0.5f, 0.0f
+    };
+
+    GLfloat colors[] = 
+    {
+        1.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f
+    };
+
+    const char* vertex_shader =
+        "#version 460\n"
+        "layout(location = 0) in vec3 vertex_position;"
+        "layout(location = 1) in vec3 vertex_color;"
+        "out vec3 color;"
+        "void main() {"
+        "   color = vertex_color;"
+        "   gl_Position = vec4(vertex_position, 1.0);"
+        "}";
+
+    const char* fragment_shader =
+        "#version 460\n"
+        "in vec3 color;"
+        "out vec4 frag_color;"
+        "void main() {"
+        "   frag_color = vec4(color, 1.0);"
+        "}";
+
+        GLuint shader_program;
+        GLuint vao;
+        
 	Window::Window(std::string title, const unsigned int width, const unsigned int height)
         : m_data({ std::move(title), width, height })
 	{
@@ -99,6 +135,68 @@ namespace LamaEngine
             }
         );
 
+        glfwSetFramebufferSizeCallback(m_pWindow,
+            [](GLFWwindow* pWindow, int width, int height)
+            {   //set to drow triangle
+                glViewport(0, 0, width, height);
+            }
+        );
+
+
+        GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vs, 1, &vertex_shader, nullptr);
+        glCompileShader(vs);
+        //create shader & compile
+        GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fs, 1, &fragment_shader, nullptr);
+        glCompileShader(fs);
+        //link shaders vs&fs
+        shader_program = glCreateProgram();
+        glAttachShader(shader_program, vs);
+        glAttachShader(shader_program, fs);
+        glLinkProgram(shader_program);
+
+        glDeleteShader(vs);
+        glDeleteShader(fs);
+
+        //fill memory GPU triengle for Drow
+        GLuint points_vbo = 0;
+        glGenBuffers(1, &points_vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(point), point, GL_STATIC_DRAW);
+
+        GLuint colors_vbo = 0;
+        glGenBuffers(1, &colors_vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+        //event data GPU moment
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+        //by zero is meant local_pos = 0; in vertex_shader
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+        glEnableVertexAttribArray(1);
+        glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+        
+        //checking for shader compilation
+        int success;
+        char infoLog[512];
+        glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
+        if (!success)
+        {
+            glGetShaderInfoLog(vs, 512, NULL, infoLog);
+            LOG_CRITICAL("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n{}", infoLog);
+        }
+        glGetShaderiv(fs, GL_COMPILE_STATUS, &success);
+        if (!success)
+        {
+            glGetShaderInfoLog(fs, 512, NULL, infoLog);
+            LOG_CRITICAL("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n{}", infoLog);
+        }
+
         return 0;
 	}
 
@@ -112,6 +210,10 @@ namespace LamaEngine
     {
         glClearColor(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);
         glClear(GL_COLOR_BUFFER_BIT);
+        //drow triengle shader
+        glUseProgram(shader_program);
+        glBindVertexArray(vao);//vao = vertex array obj
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         ImGuiIO& io = ImGui::GetIO();
         io.DisplaySize.x = static_cast<float>(get_width());
