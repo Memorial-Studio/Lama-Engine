@@ -7,6 +7,7 @@
 #include "LECore/Window.h"
 #include "LECore/Log.h"
 #include "LECore/Rendering/OpenGL/ShaderProgram.h"
+#include "LECore/Rendering/OpenGL/VertexBuffer.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -52,6 +53,8 @@ namespace LamaEngine
         "}";
 
     std::unique_ptr<ShaderProgram> p_shader_program;
+    std::unique_ptr<VertexBuffer> p_points_vbo;
+    std::unique_ptr<VertexBuffer> p_colors_vbo;
     GLuint vao;
         
 	Window::Window(std::string title, const unsigned int width, const unsigned int height)
@@ -150,26 +153,19 @@ namespace LamaEngine
             return false;
         }
 
-        //fill memory GPU triengle for Drow
-        GLuint points_vbo = 0;
-        glGenBuffers(1, &points_vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(point), point, GL_STATIC_DRAW);
-
-        GLuint colors_vbo = 0;
-        glGenBuffers(1, &colors_vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+        p_points_vbo = std::make_unique<VertexBuffer>(point, sizeof(point));
+        p_colors_vbo = std::make_unique<VertexBuffer>(colors, sizeof(colors));
+       
         //event data GPU moment
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
         //by zero is meant local_pos = 0; in vertex_shader
         glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
+        p_points_vbo->bind();
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
         glEnableVertexAttribArray(1);
-        glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
+        p_colors_vbo->bind();
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
         return 0;

@@ -11,12 +11,14 @@ set(ENGINE_PUBLIC_INCLUDES
 set(ENGINE_PRIVATE_INCLUDES 
 	src/LECore/Window.h
 	src/LECore/Rendering/OpenGL/ShaderProgram.h
+	src/LECore/Rendering/OpenGL/VertexBuffer.h
 )
 
 set(ENGINE_PRIVATE_SOURCES 
 	src/LECore/Application.cpp
 	src/LECore/Window.cpp
 	src/LECore/Rendering/OpenGL/ShaderProgram.cpp
+	src/LECore/Rendering/OpenGL/VertexBuffer.cpp
 )
 
 set(ENGINE_ALL_SOURCES
