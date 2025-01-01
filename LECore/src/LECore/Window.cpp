@@ -2,12 +2,13 @@
 // Created by Jack Daniels on 06.12.2024.
 // 
 // Changed by Jack Daniels on 07.12.2024
-// Changed by Ganza on 31.12.2024
+// Changed by Ganza on 31.12.2024 // 02.01.2025
 
 #include "LECore/Window.h"
 #include "LECore/Log.h"
 #include "LECore/Rendering/OpenGL/ShaderProgram.h"
 #include "LECore/Rendering/OpenGL/VertexBuffer.h"
+#include "LECore/Rendering/OpenGL/VertexArray.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -55,7 +56,7 @@ namespace LamaEngine
     std::unique_ptr<ShaderProgram> p_shader_program;
     std::unique_ptr<VertexBuffer> p_points_vbo;
     std::unique_ptr<VertexBuffer> p_colors_vbo;
-    GLuint vao;
+    std::unique_ptr<VertexArray> p_vao;
         
 	Window::Window(std::string title, const unsigned int width, const unsigned int height)
         : m_data({ std::move(title), width, height })
@@ -155,18 +156,10 @@ namespace LamaEngine
 
         p_points_vbo = std::make_unique<VertexBuffer>(point, sizeof(point));
         p_colors_vbo = std::make_unique<VertexBuffer>(colors, sizeof(colors));
-       
-        //event data GPU moment
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-        //by zero is meant local_pos = 0; in vertex_shader
-        glEnableVertexAttribArray(0);
-        p_points_vbo->bind();
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+        p_vao = std::make_unique<VertexArray>();
 
-        glEnableVertexAttribArray(1);
-        p_colors_vbo->bind();
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+        p_vao->add_buffer(*p_points_vbo);
+        p_vao->add_buffer(*p_colors_vbo);
 
         return 0;
 	}
@@ -183,7 +176,7 @@ namespace LamaEngine
         glClear(GL_COLOR_BUFFER_BIT);
         //drow triengle shader
         p_shader_program->bind();
-        glBindVertexArray(vao);//vao = vertex array obj
+        p_vao->bind();
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         ImGuiIO& io = ImGui::GetIO();

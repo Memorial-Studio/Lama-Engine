@@ -12,6 +12,7 @@ set(ENGINE_PRIVATE_INCLUDES
 	src/LECore/Window.h
 	src/LECore/Rendering/OpenGL/ShaderProgram.h
 	src/LECore/Rendering/OpenGL/VertexBuffer.h
+	src/LECore/Rendering/OpenGL/VertexArray.h
 )
 
 set(ENGINE_PRIVATE_SOURCES 
@@ -19,6 +20,7 @@ set(ENGINE_PRIVATE_SOURCES
 	src/LECore/Window.cpp
 	src/LECore/Rendering/OpenGL/ShaderProgram.cpp
 	src/LECore/Rendering/OpenGL/VertexBuffer.cpp
+	src/LECore/Rendering/OpenGL/VertexArray.cpp
 )
 
 set(ENGINE_ALL_SOURCES
@@ -43,6 +45,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
 target_include_directories(${ENGINE_PROJECT_NAME} PUBLIC includes)
 #set sourc C++ private
 target_include_directories(${ENGINE_PROJECT_NAME} PRIVATE src)
+
+target_compile_features(${ENGINE_PROJECT_NAME} PUBLIC cxx_std_20)
 
 #standart C++
 set(CMAKE_CXX_STANDARD 20)
