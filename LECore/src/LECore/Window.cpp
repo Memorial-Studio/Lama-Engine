@@ -6,6 +6,7 @@
 
 #include "LECore/Window.h"
 #include "LECore/Log.h"
+#include "LECore/Rendering/OpenGL/ShaderProgram.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -50,8 +51,8 @@ namespace LamaEngine
         "   frag_color = vec4(color, 1.0);"
         "}";
 
-        GLuint shader_program;
-        GLuint vao;
+    std::unique_ptr<ShaderProgram> p_shader_program;
+    GLuint vao;
         
 	Window::Window(std::string title, const unsigned int width, const unsigned int height)
         : m_data({ std::move(title), width, height })
@@ -143,21 +144,11 @@ namespace LamaEngine
         );
 
 
-        GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vs, 1, &vertex_shader, nullptr);
-        glCompileShader(vs);
-        //create shader & compile
-        GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fs, 1, &fragment_shader, nullptr);
-        glCompileShader(fs);
-        //link shaders vs&fs
-        shader_program = glCreateProgram();
-        glAttachShader(shader_program, vs);
-        glAttachShader(shader_program, fs);
-        glLinkProgram(shader_program);
-
-        glDeleteShader(vs);
-        glDeleteShader(fs);
+        p_shader_program = std::make_unique<ShaderProgram>(vertex_shader, fragment_shader);
+        if (!p_shader_program->isCompiled()) 
+        {
+            return false;
+        }
 
         //fill memory GPU triengle for Drow
         GLuint points_vbo = 0;
@@ -180,22 +171,6 @@ namespace LamaEngine
         glEnableVertexAttribArray(1);
         glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-        
-        //checking for shader compilation
-        int success;
-        char infoLog[512];
-        glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
-            glGetShaderInfoLog(vs, 512, NULL, infoLog);
-            LOG_CRITICAL("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n{}", infoLog);
-        }
-        glGetShaderiv(fs, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
-            glGetShaderInfoLog(fs, 512, NULL, infoLog);
-            LOG_CRITICAL("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n{}", infoLog);
-        }
 
         return 0;
 	}
@@ -211,7 +186,7 @@ namespace LamaEngine
         glClearColor(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);
         glClear(GL_COLOR_BUFFER_BIT);
         //drow triengle shader
-        glUseProgram(shader_program);
+        p_shader_program->bind();
         glBindVertexArray(vao);//vao = vertex array obj
         glDrawArrays(GL_TRIANGLES, 0, 3);
 

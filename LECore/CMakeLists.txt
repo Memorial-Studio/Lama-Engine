@@ -9,19 +9,33 @@ set(ENGINE_PUBLIC_INCLUDES
 )
 
 set(ENGINE_PRIVATE_INCLUDES 
-	includes/LECore/Window.h
+	src/LECore/Window.h
+	src/LECore/Rendering/OpenGL/ShaderProgram.h
 )
 
 set(ENGINE_PRIVATE_SOURCES 
 	src/LECore/Application.cpp
 	src/LECore/Window.cpp
+	src/LECore/Rendering/OpenGL/ShaderProgram.cpp
 )
 
-add_library(${ENGINE_PROJECT_NAME} STATIC
+set(ENGINE_ALL_SOURCES
 	${ENGINE_PUBLIC_INCLUDES}
 	${ENGINE_PRIVATE_SOURCES}
 	${ENGINE_PRIVATE_INCLUDES}
 )
+
+add_library(${ENGINE_PROJECT_NAME} STATIC
+	${ENGINE_ALL_SOURCES}
+)
+#CREATE in sln file struct as data 
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
+	${ENGINE_ALL_SOURCES}
+)
+
+
+
+
 
 #set includes C++ public for using
 target_include_directories(${ENGINE_PROJECT_NAME} PUBLIC includes)
