@@ -2,10 +2,14 @@
 // Created by Jack Daniels on 06.12.2024.
 // 
 // Changed by Jack Daniels on 07.12.2024
-//
+// Changed by Ganza on 31.12.2024 // 02.01.2025
 
 #include "LECore/Window.h"
 #include "LECore/Log.h"
+#include "LECore/Rendering/OpenGL/ShaderProgram.h"
+#include "LECore/Rendering/OpenGL/VertexBuffer.h"
+#include "LECore/Rendering/OpenGL/VertexArray.h"
+#include "LECore/Rendering/OpenGL/IndexBuffer.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -17,6 +21,43 @@ namespace LamaEngine
 {
     static bool s_GLFW_initialized = false;
 
+    GLfloat positions_colors2[] = {
+       -0.5f, -0.5f, 0.0f,   1.0f, 1.0f, 0.0f,
+        0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 1.0f,
+       -0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 1.0f,
+        0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f
+    };
+
+    GLuint indices[] = {
+        0, 1, 2, 3, 2, 1
+    };
+
+    const char* vertex_shader =
+        "#version 460\n"
+        "layout(location = 0) in vec3 vertex_position;"
+        "layout(location = 1) in vec3 vertex_color;"
+        "out vec3 color;"
+        "void main() {"
+        "   color = vertex_color;"
+        "   gl_Position = vec4(vertex_position, 1.0);"
+        "}";
+
+    const char* fragment_shader =
+        "#version 460\n"
+        "in vec3 color;"
+        "out vec4 frag_color;"
+        "void main() {"
+        "   frag_color = vec4(color, 1.0);"
+        "}";
+
+    std::unique_ptr<ShaderProgram> p_shader_program;
+    
+
+    std::unique_ptr<VertexBuffer> p_positions_colors_vbo;
+    std::unique_ptr<IndexBuffer> p_index_buffer;
+    std::unique_ptr<VertexArray> p_vao;
+    
+   
 	Window::Window(std::string title, const unsigned int width, const unsigned int height)
         : m_data({ std::move(title), width, height })
 	{
@@ -99,6 +140,37 @@ namespace LamaEngine
             }
         );
 
+        glfwSetFramebufferSizeCallback(m_pWindow,
+            [](GLFWwindow* pWindow, int width, int height)
+            {   //set to drow triangle
+                glViewport(0, 0, width, height);
+            }
+        );
+
+
+        p_shader_program = std::make_unique<ShaderProgram>(vertex_shader, fragment_shader);
+        if (!p_shader_program->isCompiled()) 
+        {
+            return false;
+        }
+
+        BufferLayout buffer_layout_1vec3
+        {
+            ShaderDataType::Float3
+        };
+        
+        BufferLayout buffer_layout_2vec3
+        {
+            ShaderDataType::Float3,
+            ShaderDataType::Float3
+        };
+
+        p_vao = std::make_unique<VertexArray>();
+        p_positions_colors_vbo = std::make_unique<VertexBuffer>(positions_colors2, sizeof(positions_colors2), buffer_layout_2vec3);
+        p_index_buffer = std::make_unique<IndexBuffer>(indices, sizeof(indices) / sizeof(GLuint));
+
+        p_vao->add_vertex_buffer(*p_positions_colors_vbo);
+        p_vao->set_index_buffer(*p_index_buffer);
         return 0;
 	}
 
@@ -121,10 +193,15 @@ namespace LamaEngine
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::ShowDemoWindow();
+        //ImGui::ShowDemoWindow();
 
         ImGui::Begin("Background Color Window");
         ImGui::ColorEdit4("Background Color", m_background_color);
+
+        p_shader_program->bind();
+        p_vao->bind();
+        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(p_vao->get_indices_count()), GL_UNSIGNED_INT, nullptr);
+
         ImGui::End();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

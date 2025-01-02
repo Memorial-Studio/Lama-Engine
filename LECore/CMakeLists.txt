@@ -9,24 +9,46 @@ set(ENGINE_PUBLIC_INCLUDES
 )
 
 set(ENGINE_PRIVATE_INCLUDES 
-	includes/LECore/Window.h
+	src/LECore/Window.h
+	src/LECore/Rendering/OpenGL/ShaderProgram.h
+	src/LECore/Rendering/OpenGL/VertexBuffer.h
+	src/LECore/Rendering/OpenGL/VertexArray.h
+	src/LECore/Rendering/OpenGL/IndexBuffer.h
 )
 
 set(ENGINE_PRIVATE_SOURCES 
 	src/LECore/Application.cpp
 	src/LECore/Window.cpp
+	src/LECore/Rendering/OpenGL/ShaderProgram.cpp
+	src/LECore/Rendering/OpenGL/VertexBuffer.cpp
+	src/LECore/Rendering/OpenGL/VertexArray.cpp
+	src/LECore/Rendering/OpenGL/IndexBuffer.cpp
 )
 
-add_library(${ENGINE_PROJECT_NAME} STATIC
+set(ENGINE_ALL_SOURCES
 	${ENGINE_PUBLIC_INCLUDES}
 	${ENGINE_PRIVATE_SOURCES}
 	${ENGINE_PRIVATE_INCLUDES}
 )
 
+add_library(${ENGINE_PROJECT_NAME} STATIC
+	${ENGINE_ALL_SOURCES}
+)
+#CREATE in sln file struct as data 
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
+	${ENGINE_ALL_SOURCES}
+)
+
+
+
+
+
 #set includes C++ public for using
 target_include_directories(${ENGINE_PROJECT_NAME} PUBLIC includes)
 #set sourc C++ private
 target_include_directories(${ENGINE_PROJECT_NAME} PRIVATE src)
+
+target_compile_features(${ENGINE_PROJECT_NAME} PUBLIC cxx_std_20)
 
 #standart C++
 set(CMAKE_CXX_STANDARD 20)
