@@ -43,11 +43,21 @@ namespace LamaEngine
 		bind();
 		vertex_buffer.bind();
 
-		//TODO - use buffer layout
+		// Этот цикл перебирает все элементы (атрибуты) в макете буфера вершин.
+		for (const BufferElement& current_element : vertex_buffer.get_layout().get_elements()) {
+			// Включает массив вершинных атрибутов для текущего элемента.
+			glEnableVertexAttribArray(m_elements_count);
 
-		glEnableVertexAttribArray(m_elements_count);
-		glVertexAttribPointer(m_elements_count, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-		++m_elements_count;
+			// Настраивает указатель на атрибут вершины для текущего элемента.
+			glVertexAttribPointer(
+				m_elements_count,
+				static_cast<GLint>(current_element.components_count),
+				current_element.component_type,
+				GL_FALSE,
+				static_cast<GLsizei>(vertex_buffer.get_layout().get_stride()),
+				reinterpret_cast<const void*>(current_element.offset)
+			);
+			++m_elements_count;
+		}
 	}
 }
