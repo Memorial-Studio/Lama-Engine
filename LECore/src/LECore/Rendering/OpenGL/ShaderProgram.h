@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <glm/mat4x4.hpp>
+
 namespace LamaEngine
 {
 	class ShaderProgram
@@ -21,6 +23,7 @@ namespace LamaEngine
 		void bind() const;
 		static void unbind();
 		bool isCompiled() const { return m_isCompiled; }
+		void  SetMatrix4(const char* name, const glm::mat4x4& matrix) const;
 
 	private:
 		bool m_isCompiled;

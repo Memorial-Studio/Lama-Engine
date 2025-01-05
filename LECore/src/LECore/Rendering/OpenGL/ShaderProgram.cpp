@@ -7,6 +7,7 @@
 #include "LECore/Log.h"
 
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace LamaEngine 
 {
@@ -85,6 +86,11 @@ namespace LamaEngine
     void ShaderProgram::unbind()
     {
         glUseProgram(0);
+    }
+
+    void ShaderProgram::SetMatrix4(const char* name, const glm::mat4x4& matrix) const
+    {
+        glUniformMatrix4fv(glGetUniformLocation(m_id, name), 1, GL_FALSE, glm::value_ptr(matrix));
     }
 
     ShaderProgram& ShaderProgram::operator=(ShaderProgram&& shaderProgram)
