@@ -12,3 +12,4 @@ add_subdirectory(LEEditor)
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT LamaEngineEditor)
 #standart C++
 set(CMAKE_CXX_STANDARD 20)
+

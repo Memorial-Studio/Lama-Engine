@@ -11,7 +11,7 @@
 
 class LEApp : public LamaEngine::Application 
 {
-	virtual void on_update() override
+	virtual  void on_update() override
 	{
 		//std::cout << "Update frame: " << frame++ << std::endl;
 	}

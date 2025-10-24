@@ -102,6 +102,6 @@ namespace LamaEngine
 			return type;
 		}
 
-		static const EventType type = EventType::WindowClose;
+		static const  EventType type = EventType::WindowClose;
 	};
 }

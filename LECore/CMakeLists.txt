@@ -6,6 +6,7 @@ set(ENGINE_PUBLIC_INCLUDES
 	includes/LECore/Application.h
 	includes/LECore/Event.h
 	includes/LECore/Log.h
+		includes/LECore/Camera.h
 )
 
 set(ENGINE_PRIVATE_INCLUDES 
@@ -14,11 +15,13 @@ set(ENGINE_PRIVATE_INCLUDES
 	src/LECore/Rendering/OpenGL/VertexBuffer.h
 	src/LECore/Rendering/OpenGL/VertexArray.h
 	src/LECore/Rendering/OpenGL/IndexBuffer.h
+
 )
 
 set(ENGINE_PRIVATE_SOURCES 
 	src/LECore/Application.cpp
 	src/LECore/Window.cpp
+	src/LECore/Camera.cpp
 	src/LECore/Rendering/OpenGL/ShaderProgram.cpp
 	src/LECore/Rendering/OpenGL/VertexBuffer.cpp
 	src/LECore/Rendering/OpenGL/VertexArray.cpp
